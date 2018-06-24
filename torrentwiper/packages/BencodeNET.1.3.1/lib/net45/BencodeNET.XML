@@ -1,0 +1,208 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>BencodeNET</name>
+    </assembly>
+    <members>
+        <member name="P:BencodeNET.Objects.BDictionary.Item(BencodeNET.Objects.BString)">
+            <summary>
+            Returns the value associated with the key or null if the key doesn't exist.
+            </summary>
+        </member>
+        <member name="F:BencodeNET.Objects.BNumber.MaxDigits">
+            <summary>
+            The string-length of long.MaxValue. Longer strings cannot be parsed.
+            </summary>
+        </member>
+        <member name="P:BencodeNET.Objects.BObject`1.Value">
+            <summary>
+            The underlying value of the BObject.
+            </summary>
+        </member>
+        <member name="M:BencodeNET.Objects.BObject`1.Encode">
+            <summary>
+            Encodes the object and returns the result as a string using
+            the default encoding from <c>Bencode.DefaultEncoding</c>.
+            </summary>
+            <returns>
+            The object bencoded and converted to a string using
+            the encoding of <c>Bencode.DefaultEncoding</c>.
+            </returns>
+        </member>
+        <member name="M:BencodeNET.Objects.BObject`1.Encode(System.Text.Encoding)">
+            <summary>
+            Encodes the object and returns the result as a string using the specified encoding.
+            </summary>
+            <param name="encoding">The encoding used to convert the encoded bytes to a string.</param>
+            <returns>
+            The object bencoded and converted to a string using the specified encoding.
+            </returns>
+        </member>
+        <member name="M:BencodeNET.Objects.BObject`1.EncodeToStream``1(``0)">
+            <summary>
+            Encodes the object to the specified stream and returns a reference to the stream.
+            </summary>
+            <typeparam name="TStream">The type of stream.</typeparam>
+            <param name="stream">The stream to encode the object to.</param>
+            <returns>The supplied stream.</returns>
+        </member>
+        <member name="F:BencodeNET.Objects.BString.LengthMaxDigits">
+            <summary>
+            The maximum number of digits that can be handled as the length part of a bencoded string.
+            </summary>
+        </member>
+        <member name="P:BencodeNET.Objects.BString.Encoding">
+            <summary>
+            Gets or sets the encoding used as the default with <c>ToString()</c>.
+            </summary>
+            <exception cref="T:System.ArgumentNullException"></exception>
+        </member>
+        <member name="M:BencodeNET.Objects.BString.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:BencodeNET.Objects.BString"/> class using
+            the default encoding from <c>Bencode.DefaultEncoding</c> to convert the string to bytes.
+            </summary>
+            <param name="str"></param>
+            <exception cref="T:System.ArgumentNullException"></exception>
+        </member>
+        <member name="M:BencodeNET.Objects.BString.#ctor(System.String,System.Text.Encoding)">
+            <summary>
+            Initializes a new instance of the <see cref="T:BencodeNET.Objects.BString"/> class using
+            the specified encoding to convert the string to bytes.
+            </summary>
+            <param name="str">The string.</param>
+            <param name="encoding">The encoding used to convert the string to bytes.</param>
+            <exception cref="T:System.ArgumentNullException"></exception>
+        </member>
+        <member name="P:BencodeNET.Objects.BString.Length">
+            <summary>
+            Gets the length in bytes of the string.
+            </summary>
+        </member>
+        <member name="M:BencodeNET.Objects.BString.ToString">
+            <summary>
+            Converts the underlying bytes to a string representation using the current value of the Encoding property.
+            </summary>
+            <returns>
+            A <see cref="T:System.String" /> that represents this instance.
+            </returns>
+        </member>
+        <member name="M:BencodeNET.Objects.BString.ToString(System.Text.Encoding)">
+            <summary>
+            Converts the underlying bytes to a string representation using the specified encoding.
+            </summary>
+            <param name="encoding">The encoding to use to convert the underlying byte array to a <see cref="T:System.String" />.</param>
+            <returns>
+            A <see cref="T:System.String" /> that represents this instance.
+            </returns>
+        </member>
+        <member name="M:BencodeNET.Objects.BString.Encode">
+            <summary>
+            Encodes the object and returns the result as a string using
+            the current value of the Encoding property.
+            </summary>
+            <returns>
+            The object bencoded and converted to a string using
+            the current value of the Encoding property.
+            </returns>
+        </member>
+        <member name="M:BencodeNET.Objects.BString.EncodeToStream``1(``0)">
+            <summary>
+            Encodes the object to the specified stream and returns a reference to the stream.
+            </summary>
+            <typeparam name="TStream">The type of stream.</typeparam>
+            <param name="stream">The stream to encode the object to.</param>
+            <returns>The supplied stream.</returns>
+        </member>
+        <member name="P:BencodeNET.Objects.TorrentFile.Info">
+            <summary>
+            The dictionary that describes the file(s) of the torrent
+            </summary>
+        </member>
+        <member name="P:BencodeNET.Objects.TorrentFile.Announce">
+            <summary>
+            The announce URL of the tracker
+            </summary>
+        </member>
+        <member name="P:BencodeNET.Objects.TorrentFile.AnnounceList">
+            <summary>
+            The announce URLs list of the tracker [optional]
+            </summary>
+        </member>
+        <member name="P:BencodeNET.Objects.TorrentFile.CreationDate">
+            <summary>
+            The creation date of the .torrent file [optional]
+            </summary>
+        </member>
+        <member name="P:BencodeNET.Objects.TorrentFile.Comment">
+            <summary>
+            The comment of the .torrent file [optional]
+            </summary>
+        </member>
+        <member name="P:BencodeNET.Objects.TorrentFile.CreatedBy">
+            <summary>
+            The name and version of the program used to create the .torrent [optional]
+            </summary>
+        </member>
+        <member name="P:BencodeNET.Objects.TorrentFile.Encoding">
+            <summary>
+            The encoding used by the client that created the .torrent file [optional]
+            </summary>
+        </member>
+        <member name="P:BencodeNET.Bencode.DefaultEncoding">
+            <summary>
+            Gets or sets the default encoding used to convert strings to and from bytes
+            when encoding/decoding bencode and no encoding is explicitly specified.
+            </summary>
+        </member>
+        <member name="M:BencodeNET.Bencode.Decode(System.String)">
+            <summary>
+            Decodes the specified bencoded string using the default encoding.
+            </summary>
+            <param name="bencodedString">The bencoded string.</param>
+            <returns>An <see cref="T:BencodeNET.Objects.IBObject"/> representing the bencoded string.</returns>
+            <exception cref="T:System.ArgumentNullException"></exception>
+        </member>
+        <member name="M:BencodeNET.Bencode.Decode(System.String,System.Text.Encoding)">
+            <summary>
+            Decodes the specified bencoded string using the specified encoding.
+            </summary>
+            <param name="bencodedString">The bencoded string.</param>
+            <param name="encoding">The encoding used to convert the string to bytes.</param>
+            <returns>An <see cref="T:BencodeNET.Objects.IBObject"/> representing the bencoded string.</returns>
+            <exception cref="T:System.ArgumentNullException"></exception>
+        </member>
+        <member name="M:BencodeNET.Bencode.Decode(System.IO.Stream)">
+            <summary>
+            Decodes the specified stream using the default encoding.
+            </summary>
+            <param name="stream">The stream to decode.</param>
+            <returns>An <see cref="T:BencodeNET.Objects.IBObject"/> representing the bencoded stream.</returns>
+            <exception cref="T:System.ArgumentNullException">stream</exception>
+        </member>
+        <member name="M:BencodeNET.Bencode.Decode(System.IO.Stream,System.Text.Encoding)">
+            <summary>
+            Decodes the specified stream using the specified encoding.
+            </summary>
+            <param name="stream">The stream to decode.</param>
+            /// <param name="encoding">The encoding used by <see cref="T:BencodeNET.Objects.BString"/> when calling <c>ToString()</c> with no arguments.</param>
+            <returns>An <see cref="T:BencodeNET.Objects.IBObject"/> representing the bencoded stream.</returns>
+            <exception cref="T:System.ArgumentNullException">stream</exception>
+        </member>
+        <member name="M:BencodeNET.Bencode.Decode(BencodeNET.IO.BencodeStream,System.Text.Encoding)">
+            <summary>
+            Decodes the specified stream using the specified encoding.
+            </summary>
+            <param name="stream">The stream to decode.</param>
+            /// <param name="encoding">The encoding used by <see cref="T:BencodeNET.Objects.BString"/> when calling <c>ToString()</c> with no arguments.</param>
+            <returns>An <see cref="T:BencodeNET.Objects.IBObject"/> representing the bencoded stream.</returns>
+            <exception cref="T:System.ArgumentNullException">stream</exception>
+        </member>
+        <member name="M:BencodeNET.Bencode.TryParseLongFast(System.String,System.Int64@)">
+            <summary>
+            A faster implementation than <see cref="M:System.Int64.TryParse(System.String,System.Int64@)"/>
+            because we skip some checks that are not needed.
+            </summary>
+        </member>
+    </members>
+</doc>
