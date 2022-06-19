@@ -46,7 +46,7 @@ namespace torrentwiper
             TorrentFile torrent = Bencode.DecodeTorrentFile(torrentName);
 
             add_info(torrent.Info["name"].ToString());
-            if(torrent.Info["source"] != null)
+            if (torrent.Info["source"] != null)
                 add_info(torrent.Info["source"].ToString());
             add_info(torrent.Comment);
             add_info(torrent.CreatedBy);
@@ -74,7 +74,11 @@ namespace torrentwiper
 
         private void button2_Click(object sender, EventArgs e)
         {
-            if (fileNum == 0) return; // .torrent is not loaded
+            if (fileNum == 0) // .torrent is not loaded
+            {
+                MessageBox.Show(".torrent file is not loaded");
+                return;
+            }
 
             using (var fbd = new FolderBrowserDialog())
             {
@@ -116,7 +120,25 @@ namespace torrentwiper
                 {
                     foreach (string file in listBoxFiles.Items)
                     {
-                        File.Delete(file);
+                    RETRY_DELETE:
+                        try
+                        {
+                            FileInfo fileInfo = new FileInfo(file);
+                            fileInfo.IsReadOnly = false;
+                            fileInfo.Delete();
+                        }
+                        catch (Exception ex)
+                        {
+                            var res = MessageBox.Show(ex.Message, "Error", MessageBoxButtons.AbortRetryIgnore, MessageBoxIcon.Error);
+                            if (res == DialogResult.Abort)
+                            {
+                                break;
+                            }
+                            else if (res == DialogResult.Retry)
+                            {
+                                goto RETRY_DELETE;
+                            }
+                        }
                     }
                     listBoxFiles.Items.Clear();
                     textBox3.Text = "Junk file(s) removed";
