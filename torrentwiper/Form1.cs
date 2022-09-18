@@ -98,9 +98,8 @@ namespace torrentwiper
                 torrentFolder = fbd.SelectedPath;
                 deleteSize = 0;
 
-                textBox2.Text = torrentFolder;
-                listBoxFiles.Items.Clear();
-                listBoxDirs.Items.Clear();
+                on_torrent_ui_reset(torrentFolder);
+                this.Refresh();
 
                 int totalFiles = 0, totalFolders = 0;
                 Int64 totalSize = 0;
@@ -148,6 +147,12 @@ namespace torrentwiper
                 textBox3.Text = "Junk found: " + listBoxFiles.Items.Count + " files (" + FormatSize(deleteSize) +
                     "), " + listBoxDirs.Items.Count + " folders | Total folder stats: " + totalFiles +
                     " files (" + FormatSize(totalSize) + "), " + totalFolders + " folders.";
+
+                if (listBoxFiles.Items.Count == 0 && listBoxDirs.Items.Count == 0)
+                {
+                    label1.Text = "Folder is clean";
+                    label1.BackColor = Color.LightGreen;
+                }
             }
         }
 
@@ -260,6 +265,16 @@ namespace torrentwiper
                 }
             }
             return false;
+        }
+
+        private void on_torrent_ui_reset(string folder = null)
+        {
+            textBox2.Text = string.IsNullOrEmpty(folder) ? "" : folder;
+            label1.Text = "Not included in torrent";
+            label1.BackColor = SystemColors.Control;
+            listBoxFiles.Items.Clear();
+            listBoxDirs.Items.Clear();
+            textBox3.Text = "";
         }
 
         // path without last \
