@@ -226,13 +226,13 @@ namespace torrentwiper
 
             int i = 0;
             decimal dValue = (decimal)value;
-            while (Math.Round(dValue, decimalPlaces) >= 1024)
+            while (Math.Round(dValue, decimalPlaces) >= 800)
             {
                 dValue /= 1024;
                 i++;
             }
 
-            return i == 0 ? string.Format("{0} {1}", value, SizeSuffixes[i]) :
+            return value < 1024 ? string.Format("{0} {1}", value, SizeSuffixes[0]) :
                 string.Format("{0:n" + decimalPlaces + "} {1}", dValue, SizeSuffixes[i]);
         }
 
