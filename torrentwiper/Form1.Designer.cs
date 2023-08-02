@@ -65,7 +65,7 @@
             this.listBoxInfo.HorizontalScrollbar = true;
             this.listBoxInfo.Location = new System.Drawing.Point(12, 41);
             this.listBoxInfo.Name = "listBoxInfo";
-            this.listBoxInfo.Size = new System.Drawing.Size(352, 95);
+            this.listBoxInfo.Size = new System.Drawing.Size(610, 95);
             this.listBoxInfo.TabIndex = 4;
             // 
             // btnOpenFolder
@@ -81,7 +81,7 @@
             // btnDelete
             // 
             this.btnDelete.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnDelete.Location = new System.Drawing.Point(15, 376);
+            this.btnDelete.Location = new System.Drawing.Point(15, 524);
             this.btnDelete.Name = "btnDelete";
             this.btnDelete.Size = new System.Drawing.Size(96, 23);
             this.btnDelete.TabIndex = 2;
@@ -105,7 +105,7 @@
             this.textBox1.Location = new System.Drawing.Point(117, 14);
             this.textBox1.Name = "textBox1";
             this.textBox1.ReadOnly = true;
-            this.textBox1.Size = new System.Drawing.Size(247, 20);
+            this.textBox1.Size = new System.Drawing.Size(505, 20);
             this.textBox1.TabIndex = 3;
             // 
             // textBox2
@@ -115,17 +115,17 @@
             this.textBox2.Location = new System.Drawing.Point(117, 145);
             this.textBox2.Name = "textBox2";
             this.textBox2.ReadOnly = true;
-            this.textBox2.Size = new System.Drawing.Size(247, 20);
+            this.textBox2.Size = new System.Drawing.Size(505, 20);
             this.textBox2.TabIndex = 5;
             // 
             // textBox3
             // 
             this.textBox3.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBox3.Location = new System.Drawing.Point(117, 378);
+            this.textBox3.Location = new System.Drawing.Point(117, 526);
             this.textBox3.Name = "textBox3";
             this.textBox3.ReadOnly = true;
-            this.textBox3.Size = new System.Drawing.Size(247, 20);
+            this.textBox3.Size = new System.Drawing.Size(505, 20);
             this.textBox3.TabIndex = 7;
             // 
             // tabControl1
@@ -138,7 +138,7 @@
             this.tabControl1.Location = new System.Drawing.Point(15, 184);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(349, 186);
+            this.tabControl1.Size = new System.Drawing.Size(607, 334);
             this.tabControl1.TabIndex = 6;
             // 
             // tabPage1
@@ -147,7 +147,7 @@
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(341, 160);
+            this.tabPage1.Size = new System.Drawing.Size(599, 308);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Files";
             this.tabPage1.UseVisualStyleBackColor = true;
@@ -161,7 +161,7 @@
             this.listBoxFiles.HorizontalScrollbar = true;
             this.listBoxFiles.Location = new System.Drawing.Point(0, 0);
             this.listBoxFiles.Name = "listBoxFiles";
-            this.listBoxFiles.Size = new System.Drawing.Size(341, 160);
+            this.listBoxFiles.Size = new System.Drawing.Size(599, 303);
             this.listBoxFiles.TabIndex = 0;
             // 
             // tabPage2
@@ -192,7 +192,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(376, 413);
+            this.ClientSize = new System.Drawing.Size(634, 561);
             this.Controls.Add(this.tabControl1);
             this.Controls.Add(this.textBox3);
             this.Controls.Add(this.textBox2);

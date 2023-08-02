@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 using System.IO;
-
+using System.Threading.Tasks;
 using BencodeNET;
 using BencodeNET.Objects;
 
@@ -15,13 +13,13 @@ namespace torrentwiper
 {
     public partial class Form1 : Form
     {
-        int fileNum = 0;
-        Dictionary<string, Int64> fileList = new Dictionary<string, Int64>();
-        Dictionary<string, Int64> dirList = new Dictionary<string, Int64>();
-        string torrentFolder = "";
-        string torrentName = "";
-        Int64 torrentSize = 0;
-        Int64 deleteSize = 0;
+        int _fileNum = 0;
+        readonly Dictionary<string, Int64> _fileList = new Dictionary<string, Int64>();
+        readonly Dictionary<string, Int64> _dirList = new Dictionary<string, Int64>();
+        string _torrentFolder = "";
+        string _torrentName = "";
+        Int64 _torrentSize = 0;
+        Int64 _deleteSize = 0;
 
         public Form1()
         {
@@ -39,15 +37,15 @@ namespace torrentwiper
             dialog.Filter = "Torrent files (*.torrent)|*.torrent";
             if (dialog.ShowDialog() != DialogResult.OK) return;
 
-            torrentName = dialog.FileName;
-            torrentSize = 0;
-            fileList.Clear();
-            dirList.Clear();
+            _torrentName = dialog.FileName;
+            _torrentSize = 0;
+            _fileList.Clear();
+            _dirList.Clear();
 
             listBoxInfo.Items.Clear();
-            textBox1.Text = torrentName;
+            textBox1.Text = _torrentName;
 
-            TorrentFile torrent = Bencode.DecodeTorrentFile(torrentName);
+            TorrentFile torrent = Bencode.DecodeTorrentFile(_torrentName);
 
             add_info(torrent.Info["name"].ToString());
             if (torrent.Info["source"] != null)
@@ -56,7 +54,7 @@ namespace torrentwiper
             add_info(torrent.CreatedBy);
             add_info(torrent.CreationDate);
 
-            fileNum = 0;
+            _fileNum = 0;
             BList files = (BList)torrent.Info["files"];
             foreach (BDictionary file in files)
             {
@@ -68,68 +66,68 @@ namespace torrentwiper
                 {
                     spath += "\\" + elem;
                 }
-                fileNum++;
+                _fileNum++;
                 Int64 sz = Int64.Parse(file["length"].ToString());
-                torrentSize += sz;
-                fileList.Add(spath, sz);
+                _torrentSize += sz;
+                _fileList.Add(spath, sz);
                 // add torrent's file dir
                 try
                 {
-                    dirList.Add(Path.GetDirectoryName(spath), 0);
+                    _dirList.Add(Path.GetDirectoryName(spath), 0);
                 }
                 catch (ArgumentException) { }
             }
-            add_info(fileNum.ToString() + " file(s), " + FormatSize(torrentSize));
+            add_info(_fileNum.ToString() + " file(s), " + FormatSize(_torrentSize));
         }
 
         private void btnOpenFolder_Click(object sender, EventArgs e)
         {
-            if (fileNum == 0) // .torrent is not loaded
+            if (_fileNum == 0) // .torrent is not loaded
             {
                 MessageBox.Show(".torrent file is not loaded");
                 return;
             }
 
             var fbd = new FolderBrowserDialog();
-            fbd.SelectedPath = torrentFolder;
+            fbd.SelectedPath = _torrentFolder;
             DialogResult result = fbd.ShowDialog();
             if (result == DialogResult.OK && !string.IsNullOrWhiteSpace(fbd.SelectedPath))
             {
-                torrentFolder = fbd.SelectedPath;
-                deleteSize = 0;
+                _torrentFolder = fbd.SelectedPath;
+                _deleteSize = 0;
 
-                on_torrent_ui_reset(torrentFolder);
+                on_torrent_ui_reset(_torrentFolder);
                 this.Refresh();
 
                 int totalFiles = 0, totalFolders = 0;
                 Int64 totalSize = 0;
 
                 // find junk files
-                string[] filenames = Directory.GetFiles(torrentFolder, "*", SearchOption.AllDirectories);
+                string[] filenames = Directory.GetFiles(_torrentFolder, "*", SearchOption.AllDirectories);
                 foreach (string file in filenames)
                 {
                     totalFiles++;
                     var fi = new FileInfo(file);
                     totalSize += fi.Length;
-                    string tf = file.Substring(torrentFolder.Length);
+                    string tf = file.Substring(_torrentFolder.Length);
                     try
                     {
-                        Int64 dummy = fileList[tf];
+                        Int64 dummy = _fileList[tf];
                     }
                     catch (KeyNotFoundException)
                     {
                         add_file(tf);
-                        deleteSize += fi.Length;
+                        _deleteSize += fi.Length;
                     }
                 }
 
                 // find junk folders
                 var dirs = new Dictionary<string, Int64>();
-                string[] directories = Directory.GetDirectories(torrentFolder, "*", SearchOption.AllDirectories);
+                string[] directories = Directory.GetDirectories(_torrentFolder, "*", SearchOption.AllDirectories);
                 foreach (string d in directories)
                 {
                     totalFolders++;
-                    string dir = d.Substring(torrentFolder.Length);
+                    string dir = d.Substring(_torrentFolder.Length);
                     if (dir != "\\" && !is_subdir(dir))
                     {
                         try
@@ -144,7 +142,7 @@ namespace torrentwiper
                     listBoxDirs.Items.Add(d);
                 }
 
-                textBox3.Text = "Junk found: " + listBoxFiles.Items.Count + " files (" + FormatSize(deleteSize) +
+                textBox3.Text = "Junk found: " + listBoxFiles.Items.Count + " files (" + FormatSize(_deleteSize) +
                     "), " + listBoxDirs.Items.Count + " folders | Total folder stats: " + totalFiles +
                     " files (" + FormatSize(totalSize) + "), " + totalFolders + " folders.";
 
@@ -156,67 +154,119 @@ namespace torrentwiper
             }
         }
 
-        private void btnDelete_Click(object sender, EventArgs e)
+        private async void btnDelete_Click(object sender, EventArgs e)
         {
-            if (fileNum > 0 && (listBoxFiles.Items.Count > 0 || listBoxDirs.Items.Count > 0))
+            if (_fileNum > 0 && (listBoxFiles.Items.Count > 0 || listBoxDirs.Items.Count > 0))
             {
                 DialogResult result = MessageBox.Show("Confirm junk removal", "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2);
                 if (result == DialogResult.Yes)
                 {
-                    // delete files
-                    foreach (string tf in listBoxFiles.Items)
-                    {
-                        string file = torrentFolder + tf;
-                    RETRY_DELETE_FILE:
-                        try
-                        {
-                            var fileInfo = new FileInfo(file);
-                            if (fileInfo.IsReadOnly)
-                                fileInfo.IsReadOnly = false;
-                            fileInfo.Delete();
-                        }
-                        catch (Exception ex)
-                        {
-                            var res = MessageBox.Show(ex.Message, "Error", MessageBoxButtons.AbortRetryIgnore, MessageBoxIcon.Error);
-                            if (res == DialogResult.Abort)
-                            {
-                                break;
-                            }
-                            else if (res == DialogResult.Retry)
-                            {
-                                goto RETRY_DELETE_FILE;
-                            }
-                        }
-                    }
-
-                    // delete directories
-                    foreach (string td in listBoxDirs.Items.Cast<string>().AsEnumerable().Reverse())
-                    {
-                        string dir = torrentFolder + td;
-                    RETRY_DELETE_DIR:
-                        try
-                        {
-                            Directory.Delete(dir);
-                        }
-                        catch (Exception ex)
-                        {
-                            var res = MessageBox.Show(ex.Message, "Error", MessageBoxButtons.AbortRetryIgnore, MessageBoxIcon.Error);
-                            if (res == DialogResult.Abort)
-                            {
-                                break;
-                            }
-                            else if (res == DialogResult.Retry)
-                            {
-                                goto RETRY_DELETE_DIR;
-                            }
-                        }
-                    }
-
-                    listBoxFiles.Items.Clear();
-                    listBoxDirs.Items.Clear();
-                    textBox3.Text = "Junk removed.";
+                    await Task.Run(() => DeleteJunk());
                 }
             }
+        }
+
+        private void DeleteJunk()
+        {
+            var stopwatch = new System.Diagnostics.Stopwatch();
+            string torrFolder = null;
+            string[] files = null;
+            string[] dirs = null;
+            this.Invoke((Action)(() =>
+            {
+                btnDelete.Enabled = false;
+                btnOpenFolder.Enabled = false;
+                btnOpenTorrent.Enabled = false;
+
+                torrFolder = _torrentFolder;
+                files = listBoxFiles.Items.Cast<string>().AsEnumerable().ToArray();
+                dirs = listBoxDirs.Items.Cast<string>().AsEnumerable().Reverse().ToArray();
+            }));
+            int filesNum = files.Length;
+            int dirsNum = dirs.Length;
+
+            stopwatch.Start();
+            DisplayDeleteProgress(this, filesNum, dirsNum);
+
+            // delete files
+            foreach (string tf in files)
+            {
+                string file = torrFolder + tf;
+            RETRY_DELETE_FILE:
+                try
+                {
+                    var fileInfo = new FileInfo(file);
+                    if (fileInfo.IsReadOnly)
+                        fileInfo.IsReadOnly = false;
+                    fileInfo.Delete();
+                    filesNum--;
+                    if (stopwatch.ElapsedMilliseconds > 500)
+                    {
+                        stopwatch.Restart();
+                        DisplayDeleteProgress(this, filesNum, dirsNum);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    var res = DialogResult.Retry;
+                    this.Invoke((Action)(() => res = MessageBox.Show(ex.Message, "Error", MessageBoxButtons.AbortRetryIgnore, MessageBoxIcon.Error)));
+                    if (res == DialogResult.Abort)
+                    {
+                        break;
+                    }
+                    else if (res == DialogResult.Retry)
+                    {
+                        goto RETRY_DELETE_FILE;
+                    }
+                }
+            }
+
+            // delete directories
+            foreach (string td in dirs)
+            {
+                string dir = torrFolder + td;
+            RETRY_DELETE_DIR:
+                try
+                {
+                    Directory.Delete(dir);
+                    dirsNum--;
+                    if (stopwatch.ElapsedMilliseconds > 500)
+                    {
+                        stopwatch.Restart();
+                        DisplayDeleteProgress(this, filesNum, dirsNum);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    var res = DialogResult.Retry;
+                    this.Invoke((Action)(() => res = MessageBox.Show(ex.Message, "Error", MessageBoxButtons.AbortRetryIgnore, MessageBoxIcon.Error)));
+                    if (res == DialogResult.Abort)
+                    {
+                        break;
+                    }
+                    else if (res == DialogResult.Retry)
+                    {
+                        goto RETRY_DELETE_DIR;
+                    }
+                }
+            }
+
+            stopwatch.Stop();
+            DisplayDeleteProgress(this, filesNum, dirsNum, (filesNum > 0 || dirsNum > 0) ? "DONE WITH LEFTOVERS" : "DONE CLEAN");
+            this.Invoke((Action)(() =>
+            {
+                listBoxFiles.Items.Clear();
+                listBoxDirs.Items.Clear();
+
+                btnDelete.Enabled = true;
+                btnOpenFolder.Enabled = true;
+                btnOpenTorrent.Enabled = true;
+            }));
+        }
+
+        static void DisplayDeleteProgress(Form1 form, int files, int dirs, string suffix = "")
+        {
+            form.Invoke((Action)(() => form.textBox3.Text = $"Deleting junk: {files} files, {dirs} folders... {suffix}"));
         }
 
         static readonly string[] SizeSuffixes = { "bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB" };
@@ -253,9 +303,9 @@ namespace torrentwiper
 
         private bool is_subdir(string dir)
         {
-            if (dirList.ContainsKey(dir)) return true;
+            if (_dirList.ContainsKey(dir)) return true;
 
-            foreach (string d in dirList.Keys)
+            foreach (string d in _dirList.Keys)
             {
                 if (d.Length > dir.Length)
                 {
