@@ -25,19 +25,60 @@ namespace torrentwiper
         {
             InitializeComponent();
 
+            // display version
             var assembly = System.Reflection.Assembly.GetExecutingAssembly();
             var fvi = System.Diagnostics.FileVersionInfo.GetVersionInfo(assembly.Location);
             this.Text += " " + fvi.FileVersion;
+
+            // command line
+            string[] arg = Environment.GetCommandLineArgs();
+            int argn = arg.Length;
+            string err_msg = "";
+            for (int i = 1; i < argn; i++)
+            {
+                var ai = arg[i];
+                if (ai.EndsWith(".torrent", StringComparison.OrdinalIgnoreCase))
+                    _torrentName = ai;
+                else
+                    _torrentFolder = ai;
+            }
+            if (!string.IsNullOrEmpty(_torrentName))
+            {
+                if (File.Exists(_torrentName))
+                    OpenTorrent(_torrentName);
+                else
+                    err_msg += $"Torrent file doesn't exist:\n{_torrentName}\n\n";
+            }
+            if (!string.IsNullOrEmpty(_torrentFolder))
+            {
+                if (Directory.Exists(_torrentFolder))
+                {
+                    textBox2.Text = _torrentFolder;
+                    if (_fileNum > 0) // .torrent is loaded
+                        OpenFolder(_torrentFolder);
+                }
+                else
+                    err_msg += $"Folder doesn't exist:\n{_torrentFolder}\n\n";
+            }
+            if (!string.IsNullOrEmpty(err_msg))
+                MessageBox.Show(err_msg, "torrentwiper", MessageBoxButtons.OK, MessageBoxIcon.Warning);
         }
 
         private void btnOpenTorrent_Click(object sender, EventArgs e)
         {
             OpenFileDialog dialog = new OpenFileDialog();
+            dialog.FileName = _torrentName;
             dialog.Title = "Open Torrent File";
             dialog.Filter = "Torrent files (*.torrent)|*.torrent";
-            if (dialog.ShowDialog() != DialogResult.OK) return;
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
+                OpenTorrent(dialog.FileName);
+            }
+        }
 
-            _torrentName = dialog.FileName;
+        private void OpenTorrent(string torrent_name)
+        {
+            _torrentName = torrent_name;
             _torrentSize = 0;
             _fileList.Clear();
             _dirList.Clear();
@@ -93,64 +134,69 @@ namespace torrentwiper
             DialogResult result = fbd.ShowDialog();
             if (result == DialogResult.OK && !string.IsNullOrWhiteSpace(fbd.SelectedPath))
             {
-                _torrentFolder = fbd.SelectedPath;
-                _deleteSize = 0;
+                OpenFolder(fbd.SelectedPath);
+            }
+        }
 
-                on_torrent_ui_reset(_torrentFolder);
-                this.Refresh();
+        private void OpenFolder(string folder_name)
+        {
+            _torrentFolder = folder_name;
+            _deleteSize = 0;
 
-                int totalFiles = 0, totalFolders = 0;
-                Int64 totalSize = 0;
+            on_torrent_ui_reset(_torrentFolder);
+            this.Refresh();
 
-                // find junk files
-                string[] filenames = Directory.GetFiles(_torrentFolder, "*", SearchOption.AllDirectories);
-                foreach (string file in filenames)
+            int totalFiles = 0, totalFolders = 0;
+            Int64 totalSize = 0;
+
+            // find junk files
+            string[] filenames = Directory.GetFiles(_torrentFolder, "*", SearchOption.AllDirectories);
+            foreach (string file in filenames)
+            {
+                totalFiles++;
+                var fi = new FileInfo(file);
+                totalSize += fi.Length;
+                string tf = file.Substring(_torrentFolder.Length);
+                try
                 {
-                    totalFiles++;
-                    var fi = new FileInfo(file);
-                    totalSize += fi.Length;
-                    string tf = file.Substring(_torrentFolder.Length);
+                    Int64 dummy = _fileList[tf];
+                }
+                catch (KeyNotFoundException)
+                {
+                    add_file(tf);
+                    _deleteSize += fi.Length;
+                }
+            }
+
+            // find junk folders
+            var dirs = new Dictionary<string, Int64>();
+            string[] directories = Directory.GetDirectories(_torrentFolder, "*", SearchOption.AllDirectories);
+            foreach (string d in directories)
+            {
+                totalFolders++;
+                string dir = d.Substring(_torrentFolder.Length);
+                if (dir != "\\" && !is_subdir(dir))
+                {
                     try
                     {
-                        Int64 dummy = _fileList[tf];
+                        dirs.Add(dir, 0);
                     }
-                    catch (KeyNotFoundException)
-                    {
-                        add_file(tf);
-                        _deleteSize += fi.Length;
-                    }
+                    catch (ArgumentException) { }
                 }
+            }
+            foreach (string d in dirs.Keys)
+            {
+                listBoxDirs.Items.Add(d);
+            }
 
-                // find junk folders
-                var dirs = new Dictionary<string, Int64>();
-                string[] directories = Directory.GetDirectories(_torrentFolder, "*", SearchOption.AllDirectories);
-                foreach (string d in directories)
-                {
-                    totalFolders++;
-                    string dir = d.Substring(_torrentFolder.Length);
-                    if (dir != "\\" && !is_subdir(dir))
-                    {
-                        try
-                        {
-                            dirs.Add(dir, 0);
-                        }
-                        catch (ArgumentException) { }
-                    }
-                }
-                foreach (string d in dirs.Keys)
-                {
-                    listBoxDirs.Items.Add(d);
-                }
+            textBox3.Text = "Junk found: " + listBoxFiles.Items.Count + " files (" + FormatSize(_deleteSize) +
+                "), " + listBoxDirs.Items.Count + " folders | Total folder stats: " + totalFiles +
+                " files (" + FormatSize(totalSize) + "), " + totalFolders + " folders.";
 
-                textBox3.Text = "Junk found: " + listBoxFiles.Items.Count + " files (" + FormatSize(_deleteSize) +
-                    "), " + listBoxDirs.Items.Count + " folders | Total folder stats: " + totalFiles +
-                    " files (" + FormatSize(totalSize) + "), " + totalFolders + " folders.";
-
-                if (listBoxFiles.Items.Count == 0 && listBoxDirs.Items.Count == 0)
-                {
-                    label1.Text = "Folder is clean";
-                    label1.BackColor = Color.LightGreen;
-                }
+            if (listBoxFiles.Items.Count == 0 && listBoxDirs.Items.Count == 0)
+            {
+                label1.Text = "Folder is clean";
+                label1.BackColor = Color.LightGreen;
             }
         }
 
