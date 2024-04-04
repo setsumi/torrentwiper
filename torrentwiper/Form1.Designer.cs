@@ -170,7 +170,7 @@
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(341, 160);
+            this.tabPage2.Size = new System.Drawing.Size(599, 308);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Dirs";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -184,7 +184,7 @@
             this.listBoxDirs.HorizontalScrollbar = true;
             this.listBoxDirs.Location = new System.Drawing.Point(0, 0);
             this.listBoxDirs.Name = "listBoxDirs";
-            this.listBoxDirs.Size = new System.Drawing.Size(341, 160);
+            this.listBoxDirs.Size = new System.Drawing.Size(599, 303);
             this.listBoxDirs.Sorted = true;
             this.listBoxDirs.TabIndex = 0;
             // 
@@ -205,6 +205,7 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Form1";
             this.Text = "torrentwiper";
+            this.Shown += new System.EventHandler(this.Form1_Shown);
             this.tabControl1.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
             this.tabPage2.ResumeLayout(false);

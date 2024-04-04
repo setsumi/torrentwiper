@@ -29,39 +29,6 @@ namespace torrentwiper
             var assembly = System.Reflection.Assembly.GetExecutingAssembly();
             var fvi = System.Diagnostics.FileVersionInfo.GetVersionInfo(assembly.Location);
             this.Text += " " + fvi.FileVersion;
-
-            // command line
-            string[] arg = Environment.GetCommandLineArgs();
-            int argn = arg.Length;
-            string err_msg = "";
-            for (int i = 1; i < argn; i++)
-            {
-                var ai = arg[i];
-                if (ai.EndsWith(".torrent", StringComparison.OrdinalIgnoreCase))
-                    _torrentName = ai;
-                else
-                    _torrentFolder = ai;
-            }
-            if (!string.IsNullOrEmpty(_torrentName))
-            {
-                if (File.Exists(_torrentName))
-                    OpenTorrent(_torrentName);
-                else
-                    err_msg += $"Torrent file doesn't exist:\n{_torrentName}\n\n";
-            }
-            if (!string.IsNullOrEmpty(_torrentFolder))
-            {
-                if (Directory.Exists(_torrentFolder))
-                {
-                    textBox2.Text = _torrentFolder;
-                    if (_fileNum > 0) // .torrent is loaded
-                        OpenFolder(_torrentFolder);
-                }
-                else
-                    err_msg += $"Folder doesn't exist:\n{_torrentFolder}\n\n";
-            }
-            if (!string.IsNullOrEmpty(err_msg))
-                MessageBox.Show(err_msg, "torrentwiper", MessageBoxButtons.OK, MessageBoxIcon.Warning);
         }
 
         private void btnOpenTorrent_Click(object sender, EventArgs e)
@@ -371,6 +338,42 @@ namespace torrentwiper
             listBoxFiles.Items.Clear();
             listBoxDirs.Items.Clear();
             textBox3.Text = "";
+        }
+
+        private void Form1_Shown(object sender, EventArgs e)
+        {
+            // command line
+            string[] arg = Environment.GetCommandLineArgs();
+            int argn = arg.Length;
+            string err_msg = "";
+            for (int i = 1; i < argn; i++)
+            {
+                var ai = arg[i];
+                if (ai.EndsWith(".torrent", StringComparison.OrdinalIgnoreCase))
+                    _torrentName = ai;
+                else
+                    _torrentFolder = ai;
+            }
+            if (!string.IsNullOrEmpty(_torrentName))
+            {
+                if (File.Exists(_torrentName))
+                    OpenTorrent(_torrentName);
+                else
+                    err_msg += $"Torrent file doesn't exist:\n{_torrentName}\n\n";
+            }
+            if (!string.IsNullOrEmpty(_torrentFolder))
+            {
+                if (Directory.Exists(_torrentFolder))
+                {
+                    textBox2.Text = _torrentFolder;
+                    if (_fileNum > 0) // .torrent is loaded
+                        OpenFolder(_torrentFolder);
+                }
+                else
+                    err_msg += $"Folder doesn't exist:\n{_torrentFolder}\n\n";
+            }
+            if (!string.IsNullOrEmpty(err_msg))
+                MessageBox.Show(err_msg, "torrentwiper", MessageBoxButtons.OK, MessageBoxIcon.Warning);
         }
 
         // path without last \
